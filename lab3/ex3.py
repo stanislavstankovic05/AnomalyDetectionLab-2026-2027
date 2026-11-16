@@ -7,7 +7,7 @@ from pyod.models.iforest import IForest
 from pyod.models.loda import LODA
 from pyod.models.dif import DIF
 
-data = loadmat('shuttle.mat')
+data = loadmat('./lab3/shuttle.mat')
 X = data['X']
 y = data['y'].ravel()
 
@@ -47,6 +47,6 @@ for turn in range(10):
 
     print("finished")
 
-print(f'iforest: BA = {np.mean(ba_iforest):.4f}, AUC = {np.mean(auc_iforest):.4f}')
-print(f'loda: BA = {np.mean(ba_loda):.4f}, AUC = {np.mean(auc_loda):.4f}')
-print(f'dif: BA = {np.mean(ba_dif):.4f}, AUC = {np.mean(auc_dif):.4f}')
+print(f"iforest: BA = {np.mean(ba_iforest)}, AUC = {np.mean(auc_iforest)}")
+print(f"loda: BA = {np.mean(ba_loda)}, AUC = {np.mean(auc_loda)}")
+print(f"dif: BA = {np.mean(ba_dif)}, AUC = {np.mean(auc_dif)}")
