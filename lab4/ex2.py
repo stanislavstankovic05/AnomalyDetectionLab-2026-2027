@@ -8,6 +8,9 @@ from pyod.models.deep_svdd import DeepSVDD
 from scipy.io import loadmat
 from sklearn.model_selection import train_test_split
 from sklearn.svm import OneClassSVM
+from sklearn.model_selection import GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 #1
 
 data = loadmat('./cardio.mat')
@@ -24,16 +27,44 @@ ocsvm = OneClassSVM()
 contamination_rate = count([val for val in y_train if val==1]) / len(y_train)
 
 print(f"contamination arate la : {contamination_rate}")
+
 parameters = [
     {
-        'kernel': ['linear'],
-        'nu': [0.01, 0.05, contamination_rate, 0.2, 0.5]
+        'ocsvm__kernel': ['linear'],
+        'ocsvm__nu': [0.01, 0.05, contamination_rate, 0.2, 0.5]
     },
     {
-        'kernel': ['rbf', 'poly', 'sigmoid'],
-        'gamma': ['scale', 'auto', 0.001, 0.01, 0.1, 1],
-        'nu': [0.01, 0.05, contamination_rate, 0.2, 0.5]
+        'ocsvm__kernel': ['rbf', 'poly', 'sigmoid'],
+        'ocsvm__gamma': ['scale', 'auto', 0.001, 0.01, 0.1, 1],
+        'ocsvm__nu': [0.01, 0.05, contamination_rate, 0.2, 0.5]
     }
 ]
 
 #3
+# grid = GridSearchCV(ocsvm, parameters, scoring='balanced_accuracy')
+# grid.fit(X_train, y_train)
+#
+# ba_result = balanced_accuracy_score(y_test, grid.best_estimator_.predict(X_test))
+# print(f"ba result: {ba_result}")
+
+#4
+pipeline = Pipeline([('scaler', StandardScaler()), ('ocsvm', OneClassSVM())])
+
+grid = GridSearchCV(pipeline, parameters, scoring='balanced_accuracy')
+grid.fit(X_train, y_train)
+
+ba_result = balanced_accuracy_score(y_test, grid.best_estimator_.predict(X_test))
+print(f"ba result: {ba_result}")
+
+
+#5
+label_pyod_train = y_train
+label_pyod_test = y_test
+label_sklearn_train = (-1)*2 * label_pyod_train + 1
+label_sklearn_test = (-1)*2 * label_pyod_test + 1
+
+grid = GridSearchCV(pipeline, parameters, scoring='balanced_accuracy')
+grid.fit(X_train, label_sklearn_train)
+
+ba_result = balanced_accuracy_score(label_sklearn_test, grid.best_estimator_.predict(X_test))
+print(f"ba result sklearn: {ba_result}")
