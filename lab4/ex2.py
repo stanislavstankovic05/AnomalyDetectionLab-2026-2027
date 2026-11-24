@@ -44,7 +44,9 @@ parameters = [
 # grid = GridSearchCV(ocsvm, parameters, scoring='balanced_accuracy')
 # grid.fit(X_train, y_train)
 #
-# ba_result = balanced_accuracy_score(y_test, grid.best_estimator_.predict(X_test))
+# best_model = grid.best_estimator_
+# pred_test = best_model.predict(X_test)
+# ba_result = balanced_accuracy_score(y_test, pred_test)
 # print(f"ba result: {ba_result}")
 
 #4
@@ -53,7 +55,10 @@ pipeline = Pipeline([('scaler', StandardScaler()), ('ocsvm', OneClassSVM())])
 grid = GridSearchCV(pipeline, parameters, scoring='balanced_accuracy')
 grid.fit(X_train, y_train)
 
-ba_result = balanced_accuracy_score(y_test, grid.best_estimator_.predict(X_test))
+best_model = grid.best_estimator_
+pred_test = best_model.predict(X_test)
+
+ba_result = balanced_accuracy_score(y_test, pred_test)
 print(f"ba result: {ba_result}")
 
 
@@ -66,5 +71,9 @@ label_sklearn_test = (-1)*2 * label_pyod_test + 1
 grid = GridSearchCV(pipeline, parameters, scoring='balanced_accuracy')
 grid.fit(X_train, label_sklearn_train)
 
-ba_result = balanced_accuracy_score(label_sklearn_test, grid.best_estimator_.predict(X_test))
+best_model = grid.best_estimator_
+label_sklearn_pred = best_model.predict(X_test)
+
+ba_result = balanced_accuracy_score(label_sklearn_test, label_sklearn_pred)
 print(f"ba result sklearn: {ba_result}")
+print(f"best parameters: {grid.best_params_}")
